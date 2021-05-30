@@ -674,6 +674,8 @@ In this part, I will try to create a **reflex agent with internal state** in an 
 
 _For future reference, today's version will be referenced as **Caleb**._
 
+![Part 3&apos;s Milestone](../../.gitbook/assets/image%20%2824%29.png)
+
 ### The Scenario
 
 We are going to expand from the previous part. In today's scenario, we are going to put our hunter in a grid of `M x N`.
