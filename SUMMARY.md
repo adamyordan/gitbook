@@ -1,5 +1,8 @@
 # Table of contents
 
-* [Home page](README.md)
-* [My Take on Chrome Sandbox Escape Exploit Chain](chrome-sandbox-escape.md)
+* [Home](README.md)
+
+## Blog
+
+* [A Take on Chrome Sandbox Escape Exploit Chain](blog/chrome-sandbox-escape.md)
 
