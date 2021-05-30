@@ -1,5 +1,5 @@
 ---
-description: 02-02-2020 — Written by Adam Jordan — 11 min read
+description: 2020-02-02 — Written by Adam Jordan — 11 min read
 ---
 
 # A Take on Chrome Sandbox Escape Exploit Chain
@@ -12,25 +12,25 @@ As disclaimer, this is **not** a bug that I find, **nor** that this is a full wr
 
 Google Chrome is based on Chromium, an open-source browser that is also forked into several other popular browsers, e.g. Opera, and Microsoft Edge.
 
-![Chromium Separated Processes](../.gitbook/assets/image%20%282%29.png)
+![Chromium Separated Processes](../../.gitbook/assets/image%20%282%29.png)
 
 Chromium's architecture allocates the components into separated process between the browser kernel process and the rendering engine process. We can roughly say that the renderer process represent the _Tab_ \(though one renderer process can manage multiple tabs in some cases\), while the browser process represent the _Browser_ itself. So, in a chrome instance, there are 1 Browser Process and several Renderer Process.
 
-![UI Representation with Chromium processes](../.gitbook/assets/image%20%2811%29.png)
+![UI Representation with Chromium processes](../../.gitbook/assets/image%20%2811%29.png)
 
 Also because of this architecture, if a web page is misbehaving and causes a process to crash, this will not crash the whole browser. Instead, it will only crash the specific tab opening the page.
 
-![Tab crash does not affect browser](../.gitbook/assets/image%20%286%29.png)
+![Tab crash does not affect browser](../../.gitbook/assets/image%20%286%29.png)
 
 The renderer process is responsible for operations that need fast performance, such as HTML and CSS parsing, Javascript interpreter, Regex, DOM, etc. While these operations are fast, most of browser vulnerabilities found are related to these actions. On the other side, the browser process is responsible for more sensitive operations, such as cookie database, network management, window management, etc.
 
 According to this paper [_The Security Architecture of the Chromium Browser_](https://seclab.stanford.edu/websec/chromium/chromium-security-architecture.pdf), the operations in renderer process contributes around 75% of the vulnerabilities \(disclaimer: I'm doing rough unreliable non-academic estimate\). So, the chance to compromise the renderer process is higher than compromising the browser process, which lead to a solution of **sandboxing** the renderer process.
 
-![](../.gitbook/assets/image%20%2810%29.png)
+![](../../.gitbook/assets/image%20%2810%29.png)
 
 By running the renderer process in a sandbox with restricted privilege, we can mitigate high-severity attacks, such as preventing compromised renderer process to read / write to filesystem. Sandboxing force the renderer process to communicate with browser process API to interact with the outside world. The goal of the sandbox is to require even a compromised renderer process to use browser process interface to interact with the system. This communication between renderer processes and browser process is using [Mojo IPC](https://chromium.googlesource.com/chromium/src.git/+/master/mojo/README.md), an open source IPC library.
 
-![](../.gitbook/assets/image%20%284%29.png)
+![](../../.gitbook/assets/image%20%284%29.png)
 
 One way that allow us to easily interact with Mojo is by activating the MojoJS Binding feature in Chromium. We can activate the feature by running the browser with flag `--enable-blink-features=MojoJS`. If this feature is activated, the browser will expose a `Mojo` javascript object that allows us to interact and override Mojo interfaces.
 
@@ -80,7 +80,7 @@ Chrome is using V8 Javascript Engine which implementing **JIT \(Just-in-Time\)**
 
 Basically, a code will be executed with **interpreter \(**_**Ignition**_**\)** by default, and V8 will keep track of how many times the code segments are executed. If the code segments are executed many times \(hot code segments\), the code segments will be compiled with a **compiler \(**_**TurboFan**_**\)**. In this compilation, optimisations will be applied, thus producing a faster execution time.
 
-![](../.gitbook/assets/image%20%2813%29.png)
+![](../../.gitbook/assets/image%20%2813%29.png)
 
 Therefore, to make the optimiser remove the bounds-checking, we may need to run the function a lot of times before, thus triggering the JS engine to compile and optimise our `fun` function, eliminating the bounds checking.
 
@@ -143,7 +143,7 @@ BlobImpl.prototype = {
 }
 ```
 
-![](../.gitbook/assets/image.png)
+![](../../.gitbook/assets/image.png)
 
 Note that destroying the FileWriter handle in renderer process will trigger the destruction of FileWriterImpl in browser process because FileWriterImpl is created and bound with `mojo::StrongBinding`.
 
@@ -175,7 +175,7 @@ The idea is as follows:
 * With MojoJS Binding now enabled and exposed to JS context, the page can communicate with Mojo IPC interface directly.
 * Execute the UAF exploit to free FileWriterImpl \(discussed in previous section\), virtually bypassing sandbox and crashing the Browser Process.
 
-![](../.gitbook/assets/sandbox_idea.gif)
+![](../../.gitbook/assets/sandbox_idea.gif)
 
 ### Enabling MojoJS Binding
 
@@ -278,7 +278,7 @@ Inside our custom `getInternalUUID`, we free the `FileWriterImpl` instance. When
 
 ## Sandbox Escape Demo
 
-![](../.gitbook/assets/sandbox_escape.gif)
+![](../../.gitbook/assets/sandbox_escape.gif)
 
 ## Conclusion
 

@@ -4,9 +4,7 @@
 
 ## Blog
 
-* [A Take on Chrome Sandbox Escape Exploit Chain](blog/chrome-sandbox-escape.md)
-
----
-
-* [A Case Study on Jenkins RCE](untitled.md)
+* [Security](blog/security/README.md)
+  * [A Take on Chrome Sandbox Escape Exploit Chain](blog/security/chrome-sandbox-escape.md)
+  * [A Case Study on Jenkins RCE](blog/security/untitled.md)
 
