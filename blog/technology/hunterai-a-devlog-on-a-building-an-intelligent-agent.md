@@ -6,13 +6,15 @@ description: Project Devlog
 
 ## Introduction
 
-This is my project devlog to create a _certain complex_ AI. In each part of this page, I will write about my progress in developing and upgrading the complexity of the AI program from the previous version.
+This is my project devlog to create a _certain complex_ AI. In each part of this page, I will write about my journey progress in developing and upgrading the complexity of the AI program from the previous version.
 
 {% embed url="https://github.com/adamyordan/hunterAI" %}
 
 ## Part 1: Creating a simple Intelligent Agent
 
-### Goal
+> Written on 2019-09-16
+
+### Today's Goal
 
 For the first part, I will try to make an intelligent agent that can hunt monster. I name this agent: **Hunter**. \(_In the future, this version will be referenced as **Alexander**_\)
 
@@ -297,7 +299,9 @@ Today, we learned about Intelligent agent and we have built a very simple intell
 
 ## Part 2: Integrating AI Agent with Unity
 
-### Goal
+> Written on 2019-09-19
+
+### Today's Goal
 
 In this part, I will try to create a 3D visualization using Unity and connect it to our agent written in python. You may want to read the previous part about **Alexander** AI concept because we will reuse a lot of the concepts. \(_In the future, today's version will be referenced as **Barton**_\).
 
@@ -667,6 +671,8 @@ In this Part 2, we learned how to connect an Intelligent agent with a Unity scen
 
 
 ## Part 3: Top-down Shooter AI
+
+> Written on 2020-01-28
 
 ### Today's Goal
 
