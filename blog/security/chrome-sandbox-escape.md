@@ -1,5 +1,5 @@
 ---
-description: 2020-02-02 — Written by Adam Jordan — 11 min read
+description: 2020-02-02 — 11 min read
 ---
 
 # A Take on Chrome Sandbox Escape Exploit Chain

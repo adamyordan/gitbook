@@ -1,5 +1,5 @@
 ---
-description: 2020-01-21 — Written by Adam Jordan — 7 min read
+description: 2020-01-21 — 7 min read
 ---
 
 # A Case Study on Jenkins RCE
