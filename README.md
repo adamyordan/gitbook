@@ -1,4 +1,4 @@
-# Home
+# /root
 
 Welcome to my Notebook. My name is Adam. On the internet, I usually go with username `adamyordan`. In this gitbook, I will write about things I am interested in.
 
