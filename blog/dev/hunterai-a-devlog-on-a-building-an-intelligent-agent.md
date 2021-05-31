@@ -8,7 +8,13 @@ description: Project Devlog
 
 This is my project devlog to create a _certain complex_ AI. In each part of this page, I will write about my journey progress in developing and upgrading the complexity of the AI program from the previous version.
 
-{% embed url="https://github.com/adamyordan/hunterAI" %}
+## Latest State
+
+{% embed url="https://www.youtube.com/watch?v=XRnqPfFGsps" %}
+
+On 28 January 2020, I created a **reflex agent with internal state** in an imperfect information environment. Specifically, I created a top-down shooter AI with limited vision range to its surrounding. Using common pathfinding algorithm \(in this case, BFS\), the AI agent is able to determine an efficient way to discover monsters and position itself in the nearest shooting position.
+
+{% embed url="https://github.com/adamyordan/hunterAI" caption="Source code: https://github.com/adamyordan/hunterAI" %}
 
 ## Part 1: Creating a simple Intelligent Agent
 
