@@ -36,15 +36,15 @@ In the repository, we can see that the patches are blacklisting some annotations
 
 We can see that there is a difference in how `GroovySandbox` class creates the _compiler configuration_. There is an additional step that add _compilation customizer_ `RejectASTTransformsCustomizer` that with a the disabled transformations of only a single value: `GrabAnnotationTransformation.class.getName()`.
 
-![](../../.gitbook/assets/image%20%287%29.png)
+![](../../../.gitbook/assets/image%20%287%29.png)
 
 The `RejectASTTransformsCustomizer` is a new class with a logic that traverse annotations and do simple blacklist checking:
 
-![](../../.gitbook/assets/image%20%2812%29.png)
+![](../../../.gitbook/assets/image%20%2812%29.png)
 
 We can also see that there is a new test code that check if the blacklist `Grab` annotation.
 
-![](../../.gitbook/assets/image%20%2816%29.png)
+![](../../../.gitbook/assets/image%20%2816%29.png)
 
 ## The Grab Annotation
 
@@ -87,11 +87,11 @@ print new ProcBuilder("/bin/bash").withArgs("-c","cat /etc/passwd").run().getOut
 
 Let's try putting the pipeline script in a Jenkins Job with _Use Groovy Sandbox_ enabled.
 
-![](../../.gitbook/assets/image%20%2814%29.png)
+![](../../../.gitbook/assets/image%20%2814%29.png)
 
 After triggering the job build, the script above will be compiled and executed in Jenkins master. After the job build is done, we can see the result of the shell command `cat /etc/passwd` in the job console output.
 
-![](../../.gitbook/assets/image%20%289%29.png)
+![](../../../.gitbook/assets/image%20%289%29.png)
 
 Furthermore, we can work on getting the reverse shell session using the same method.
 
@@ -120,13 +120,13 @@ We can see a list of user at `$JENKINS_HOME/users`. Moreover, we can see data or
 
 We can use this access token to authenticate in Jenkins Web dashboard by setting it in `Authorization` HTTP Header. For demonstration, we can use curl to do _whoami_ in Jenkins:
 
-![](../../.gitbook/assets/image%20%285%29.png)
+![](../../../.gitbook/assets/image%20%285%29.png)
 
 ### Maintaining Persistence
 
 Apart from regular maintaining persistence techniques, such as using crontab, or injecting `.bashrc`, we can utilize the hijacked Jenkins admin account. Jenkins provides a script console functionality that can be used admin to execute arbitrary Groovy script in **non-sandbox** mode.
 
-![](../../.gitbook/assets/image%20%283%29.png)
+![](../../../.gitbook/assets/image%20%283%29.png)
 
 Moreover, we can also use this console to enumerate stored secrets in Jenkins with the following script:
 
@@ -158,7 +158,7 @@ We can learn from the past incidents that the damage is fatal:
 
 We need to also be aware that Jenkins is an old piece of software written in early 2000s and may contains many legacy code and bugs.
 
-![](../../.gitbook/assets/image%20%2815%29.png)
+![](../../../.gitbook/assets/image%20%2815%29.png)
 
 From the charts \([source](https://www.cvedetails.com/product/34004/Jenkins-Jenkins.html?vendor_id=15865)\) displayed above, we can see that Jenkins are affected by lots of critical vulnerabilities, especially in recent years. Constant check and software update on Jenkins instance is highly recommended and necessary to create a safe environment within an organization.
 
