@@ -282,7 +282,7 @@ F ? ? ? ? ? ?
 
 ### Finding the exponent "e"
 
-Looking at the matrix, there is a notable finding there: the location of `}`  which is \(5, 5\). If we do exponentiation to the matrix by `e`. The values of index \(5, 5\) is `ord('}') ** e`. With this, we can quickly brute force the value of `e`. Note that the last 32 digits of \(5, 5\) in `enc` is _92880428233183920383453369140625_.
+Looking at the matrix, there is a notable finding there: the location of `}`  which is \(4, 4\). If we do exponentiation to the matrix by `e`. The values of index \(4, 4\) is `ord('}') ** e`. With this, we can quickly brute force the value of `e`. Note that the last 32 digits of values inside cell \(5, 5\) in `enc` is _92880428233183920383453369140625_.
 
 ```python
 e = 1
