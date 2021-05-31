@@ -664,9 +664,7 @@ In this Part 2, we learned how to connect an Intelligent agent with a Unity scen
 
 ### Source Code
 
-{% embed url="https://github.com/adamyordan/hunterAI/tree/master/barton" %}
-
-
+[https://github.com/adamyordan/hunterAI/tree/master/barton](https://github.com/adamyordan/hunterAI/tree/master/barton)
 
 
 
@@ -1224,7 +1222,7 @@ Combined with the configurability of our visualization, I believe this is a good
 
 ### Source code
 
-{% embed url="https://github.com/adamyordan/hunterAI/tree/master/caleb" %}
+[https://github.com/adamyordan/hunterAI/tree/master/caleb](https://github.com/adamyordan/hunterAI/tree/master/caleb)
 
 ### Reference
 

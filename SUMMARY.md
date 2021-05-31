@@ -10,3 +10,7 @@
 * [Tech](blog/technology/README.md)
   * [HunterAI: A Devlog on a building an Intelligent Agent](blog/technology/hunterai-a-devlog-on-a-building-an-intelligent-agent.md)
 
+## Projects
+
+* [Laplace](https://project-laplace.herokuapp.com)
+
