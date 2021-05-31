@@ -2,7 +2,7 @@
 
 ## Challenge Description
 
-> #### **Challenge: Illusion - web - 152 pts**
+> #### **Illusion - web - 152 pts**
 >
 > Laura just found a website used for monitoring security mechanisms on Rhiza's state and is planning to hack into it to forge the status of these security services. After that she will desactivate these security resources without alerting government agents. Your goal is to get into the server to change the monitoring service behavior.
 >
