@@ -11,6 +11,8 @@
   * [CTF Writeups](blog/security/ctf-writeups/README.md)
     * [Pwn2Win 2021 - Illusion](blog/security/ctf-writeups/pwn2win-2021-illusion.md)
     * [Pwn2Win 2021 - Lost Exponent](blog/security/ctf-writeups/pwn2win-2021-lost-exponent.md)
+  * [Software Review](blog/security/software-review/README.md)
+    * [Elastic SIEM Review](blog/security/software-review/elastic-siem-review.md)
   * [Tips](blog/security/tips/README.md)
     * [Compile and run rpcapd for Android](blog/security/tips/compile-and-run-rpcapd-for-android.md)
     * [Forwarding TCPDump from Android to Wireshark](blog/security/tips/forwarding-tcpdump-from-android-to-wireshark.md)
