@@ -28,5 +28,5 @@
 
 ## Projects
 
-* [Laplace](https://project-laplace.herokuapp.com)
+* [Laplace](https://laplace.adamjordan.id)
 
