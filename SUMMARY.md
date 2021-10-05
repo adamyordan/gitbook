@@ -29,4 +29,5 @@
 ## Projects
 
 * [Laplace](https://laplace.adamjordan.id)
+* [Librarian](https://thesilentlibrarian.github.io/)
 
