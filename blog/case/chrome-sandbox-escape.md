@@ -1,10 +1,11 @@
 ---
 description: 2020-02-02 — 11 min read
+layout: editorial
 ---
 
 # A Take on Chrome Sandbox Escape Exploit Chain
 
-Google's Project Zero published a [blog post](https://googleprojectzero.blogspot.com/2019/04/virtually-unlimited-memory-escaping.html) explaining an exploit chain that bypass the Chrome browser sandbox. In this post, I will try to discuss my take on trying to understand the exploit chain. In summary, the sandbox bypass is made possible because of an [Out-of-bound read and write bug](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-5782) in renderer process, chained with a [Use-After-Free \(UAF\) bug](https://bugs.chromium.org/p/project-zero/issues/detail?id=1755) in the browser process, triggered via Mojo IPC connection.
+Google's Project Zero published a [blog post](https://googleprojectzero.blogspot.com/2019/04/virtually-unlimited-memory-escaping.html) explaining an exploit chain that bypass the Chrome browser sandbox. In this post, I will try to discuss my take on trying to understand the exploit chain. In summary, the sandbox bypass is made possible because of an [Out-of-bound read and write bug](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-5782) in renderer process, chained with a [Use-After-Free (UAF) bug](https://bugs.chromium.org/p/project-zero/issues/detail?id=1755) in the browser process, triggered via Mojo IPC connection.
 
 As disclaimer, this is **not** a bug that I find, **nor** that this is a full writeup about the exploit. I made this post to help me organise my thought in trying to understand the bug and the exploit.
 
@@ -12,33 +13,33 @@ As disclaimer, this is **not** a bug that I find, **nor** that this is a full wr
 
 Google Chrome is based on Chromium, an open-source browser that is also forked into several other popular browsers, e.g. Opera, and Microsoft Edge.
 
-![Chromium Separated Processes](../../../.gitbook/assets/image%20%282%29.png)
+![Chromium Separated Processes](<../../.gitbook/assets/image (2).png>)
 
-Chromium's architecture allocates the components into separated process between the browser kernel process and the rendering engine process. We can roughly say that the renderer process represent the _Tab_ \(though one renderer process can manage multiple tabs in some cases\), while the browser process represent the _Browser_ itself. So, in a chrome instance, there are 1 Browser Process and several Renderer Process.
+Chromium's architecture allocates the components into separated process between the browser kernel process and the rendering engine process. We can roughly say that the renderer process represent the _Tab_ (though one renderer process can manage multiple tabs in some cases), while the browser process represent the _Browser_ itself. So, in a chrome instance, there are 1 Browser Process and several Renderer Process.
 
-![UI Representation with Chromium processes](../../../.gitbook/assets/image%20%2811%29.png)
+![UI Representation with Chromium processes](<../../.gitbook/assets/image (11).png>)
 
 Also because of this architecture, if a web page is misbehaving and causes a process to crash, this will not crash the whole browser. Instead, it will only crash the specific tab opening the page.
 
-![Tab crash does not affect browser](../../../.gitbook/assets/image%20%286%29.png)
+![Tab crash does not affect browser](<../../.gitbook/assets/image (6).png>)
 
 The renderer process is responsible for operations that need fast performance, such as HTML and CSS parsing, Javascript interpreter, Regex, DOM, etc. While these operations are fast, most of browser vulnerabilities found are related to these actions. On the other side, the browser process is responsible for more sensitive operations, such as cookie database, network management, window management, etc.
 
-According to this paper [_The Security Architecture of the Chromium Browser_](https://seclab.stanford.edu/websec/chromium/chromium-security-architecture.pdf), the operations in renderer process contributes around 75% of the vulnerabilities \(disclaimer: I'm doing rough unreliable non-academic estimate\). So, the chance to compromise the renderer process is higher than compromising the browser process, which lead to a solution of **sandboxing** the renderer process.
+According to this paper [_The Security Architecture of the Chromium Browser_](https://seclab.stanford.edu/websec/chromium/chromium-security-architecture.pdf), the operations in renderer process contributes around 75% of the vulnerabilities (disclaimer: I'm doing rough unreliable non-academic estimate). So, the chance to compromise the renderer process is higher than compromising the browser process, which lead to a solution of **sandboxing** the renderer process.
 
-![](../../../.gitbook/assets/image%20%2810%29.png)
+![](<../../.gitbook/assets/image (10).png>)
 
 By running the renderer process in a sandbox with restricted privilege, we can mitigate high-severity attacks, such as preventing compromised renderer process to read / write to filesystem. Sandboxing force the renderer process to communicate with browser process API to interact with the outside world. The goal of the sandbox is to require even a compromised renderer process to use browser process interface to interact with the system. This communication between renderer processes and browser process is using [Mojo IPC](https://chromium.googlesource.com/chromium/src.git/+/master/mojo/README.md), an open source IPC library.
 
-![](../../../.gitbook/assets/image%20%284%29.png)
+![](<../../.gitbook/assets/image (4).png>)
 
 One way that allow us to easily interact with Mojo is by activating the MojoJS Binding feature in Chromium. We can activate the feature by running the browser with flag `--enable-blink-features=MojoJS`. If this feature is activated, the browser will expose a `Mojo` javascript object that allows us to interact and override Mojo interfaces.
 
 ## Out-of-Bound Read/Write in Renderer Process
 
-There is an out-of-bound memory access bug in renderer process discovered by @S0rryMybad \(CVE-2019-5782\). The bug resulted from incorrectly estimating the possible range of `arguments.length`. The JS optimiser incorrectly assumes that the maximum length of arguments is `65534`, while actually the it can be larger. From this wrong estimation, optimiser evaluate that `arguments.length >> 16` will always be `0` \(which is incorrect\).
+There is an out-of-bound memory access bug in renderer process discovered by @S0rryMybad (CVE-2019-5782). The bug resulted from incorrectly estimating the possible range of `arguments.length`. The JS optimiser incorrectly assumes that the maximum length of arguments is `65534`, while actually the it can be larger. From this wrong estimation, optimiser evaluate that `arguments.length >> 16` will always be `0` (which is incorrect).
 
-We can leverage this to trigger BCE \(Bounds-Check-Elimination\) optimisation in JS compiler. In JS, Bounds checking is done when we are accessing or writing arrays. For example, if when we try to write index `3` of an array with length `1`, the bound checking will be done and no operation will be done. In the example below, it will output expected result `['y']`
+We can leverage this to trigger BCE (Bounds-Check-Elimination) optimisation in JS compiler. In JS, Bounds checking is done when we are accessing or writing arrays. For example, if when we try to write index `3` of an array with length `1`, the bound checking will be done and no operation will be done. In the example below, it will output expected result `['y']`
 
 ```javascript
 function fun(arg) {
@@ -74,13 +75,13 @@ args.length = 65537
 console.log(fun(...args)) // output: ??
 ```
 
-You may notice that if you run that JS code in a javascript console \(e.g. Chrome dev console\), it will still output `['y']`. Does this means that our exploit does not work? This is related to JIT paradigm in Chrome.
+You may notice that if you run that JS code in a javascript console (e.g. Chrome dev console), it will still output `['y']`. Does this means that our exploit does not work? This is related to JIT paradigm in Chrome.
 
-Chrome is using V8 Javascript Engine which implementing **JIT \(Just-in-Time\)** paradigm, which combines the use of interpreter and compiler for executing code.
+Chrome is using V8 Javascript Engine which implementing **JIT (Just-in-Time)** paradigm, which combines the use of interpreter and compiler for executing code.
 
-Basically, a code will be executed with **interpreter \(**_**Ignition**_**\)** by default, and V8 will keep track of how many times the code segments are executed. If the code segments are executed many times \(hot code segments\), the code segments will be compiled with a **compiler \(**_**TurboFan**_**\)**. In this compilation, optimisations will be applied, thus producing a faster execution time.
+Basically, a code will be executed with **interpreter (**_**Ignition**_**)** by default, and V8 will keep track of how many times the code segments are executed. If the code segments are executed many times (hot code segments), the code segments will be compiled with a **compiler (**_**TurboFan**_**)**. In this compilation, optimisations will be applied, thus producing a faster execution time.
 
-![](../../../.gitbook/assets/image%20%2813%29.png)
+![](<../../.gitbook/assets/image (13).png>)
 
 Therefore, to make the optimiser remove the bounds-checking, we may need to run the function a lot of times before, thus triggering the JS engine to compile and optimise our `fun` function, eliminating the bounds checking.
 
@@ -128,11 +129,11 @@ void BlobStorageContext::GetBlobDataFromBlobPtr(blob, callback) {
 }
 ```
 
-We see that in `GetBlobDataFromBlobPtr()`, it will call an asynchronous function `GetInternalUUID` to get the blob UUID, then call our provided callback. Fortunately \(or unfortunately?\), the `GetInternalUUID` is a mojo interface method. This means that renderer can define the implementation of `GetInternalUUID` if it passes a renderer-hosted Blob implementation instead of browser-process-hosted blob.
+We see that in `GetBlobDataFromBlobPtr()`, it will call an asynchronous function `GetInternalUUID` to get the blob UUID, then call our provided callback. Fortunately (or unfortunately?), the `GetInternalUUID` is a mojo interface method. This means that renderer can define the implementation of `GetInternalUUID` if it passes a renderer-hosted Blob implementation instead of browser-process-hosted blob.
 
-In short, what it implies is: If we \(attacker\) is able to control the renderer process, we can define the implementation of `GetInternalUUID`.
+In short, what it implies is: If we (attacker) is able to control the renderer process, we can define the implementation of `GetInternalUUID`.
 
-In our implementation of `GetInternalUUID`, we can destroy the renderer handle to FileWriter. This will trigger immediate destruction \(free\) of FileWriterImpl. Thus, when `GetInternalUUID` returns, it will call the callback while using the provided `base::Unretained(*FileWriterImpl)`, which is a stale pointer of an already freed object. Normally this will cause the browser process to crash.
+In our implementation of `GetInternalUUID`, we can destroy the renderer handle to FileWriter. This will trigger immediate destruction (free) of FileWriterImpl. Thus, when `GetInternalUUID` returns, it will call the callback while using the provided `base::Unretained(*FileWriterImpl)`, which is a stale pointer of an already freed object. Normally this will cause the browser process to crash.
 
 ```c
 BlobImpl.prototype = {
@@ -143,7 +144,7 @@ BlobImpl.prototype = {
 }
 ```
 
-![](../../../.gitbook/assets/image.png)
+![](../../.gitbook/assets/image.png)
 
 Note that destroying the FileWriter handle in renderer process will trigger the destruction of FileWriterImpl in browser process because FileWriterImpl is created and bound with `mojo::StrongBinding`.
 
@@ -170,12 +171,12 @@ Let's limit our goal, we just want to crash the Chrome browser of a normal user 
 The idea is as follows:
 
 * Victim visit our specially crafted HTML page
-* With CVE-2019-5782, we setup Out-of-Bound Read/Write in Renderer Process \(discussed in previous section\)
-* With OoB read/write, we enable MojoJS Binding in browser \(discussed later\)
+* With CVE-2019-5782, we setup Out-of-Bound Read/Write in Renderer Process (discussed in previous section)
+* With OoB read/write, we enable MojoJS Binding in browser (discussed later)
 * With MojoJS Binding now enabled and exposed to JS context, the page can communicate with Mojo IPC interface directly.
-* Execute the UAF exploit to free FileWriterImpl \(discussed in previous section\), virtually bypassing sandbox and crashing the Browser Process.
+* Execute the UAF exploit to free FileWriterImpl (discussed in previous section), virtually bypassing sandbox and crashing the Browser Process.
 
-![](../../../.gitbook/assets/sandbox_idea.gif)
+![](../../.gitbook/assets/sandbox\_idea.gif)
 
 ### Enabling MojoJS Binding
 
@@ -194,7 +195,7 @@ void RenderFrameImpl::DidCreateScriptContext(v8::Local context,
 }
 ```
 
-In the function, MojoJS is enabled if `(enabled_bindings_ & BINDINGS_POLICY_MOJO_WEB_UI)` is true\). By using OoB memory access bug, we can write and set the `enabled_bindings_` variable `BINDINGS_POLICY_MOJO_WEB_UI` value. Then, we can reload the page so `Mojo` in our javascript context.
+In the function, MojoJS is enabled if `(enabled_bindings_ & BINDINGS_POLICY_MOJO_WEB_UI)` is true). By using OoB memory access bug, we can write and set the `enabled_bindings_` variable `BINDINGS_POLICY_MOJO_WEB_UI` value. Then, we can reload the page so `Mojo` in our javascript context.
 
 ### Sandbox Escape and Crashing the Browser
 
@@ -270,7 +271,7 @@ async function crash(oob) {
 }
 ```
 
-In `index.html`, we are setting up the out-of-bound read/write bug by exploiting CVE-2019-5782. Then, at first we visit the page, we enable the Mojo binding, and reload the page. Now that the Mojo binding is enabled \(not undefined\), we call the `crash` function.
+In `index.html`, we are setting up the out-of-bound read/write bug by exploiting CVE-2019-5782. Then, at first we visit the page, we enable the Mojo binding, and reload the page. Now that the Mojo binding is enabled (not undefined), we call the `crash` function.
 
 In `crash` function, we are registering a blob with id `blob_0` to blob registry, then we define our custom Blob implementation with a malicious implementation of `getInternalUUID`. Finally we call the `Write` function with a custom renderer-hosted blob implementation.
 
@@ -278,11 +279,11 @@ Inside our custom `getInternalUUID`, we free the `FileWriterImpl` instance. When
 
 ## Sandbox Escape Demo
 
-![](../../../.gitbook/assets/sandbox_escape.gif)
+![](../../.gitbook/assets/sandbox\_escape.gif)
 
 ## Conclusion
 
-Please note that this is not a writeup of an exploit. In this post, I discussed about the general idea how to escape the sandbox in Chromium-based browser, in this case Google Chrome. The idea presented in this post can still be leveraged to increase the damage, e.g. executing system call to execute a program \(e.g. popup calculator\). As I first mentioned, this post acts to help me organise my thought while trying to understand the exploit chain posted in Project Zero blog. Therefore, I recommend reading [their post](https://github.com/adamyordan/blog/blob/master/content/posts/googleprojectzero.blogspot.com/2019/04/virtually-unlimited-memory-escaping.html).
+Please note that this is not a writeup of an exploit. In this post, I discussed about the general idea how to escape the sandbox in Chromium-based browser, in this case Google Chrome. The idea presented in this post can still be leveraged to increase the damage, e.g. executing system call to execute a program (e.g. popup calculator). As I first mentioned, this post acts to help me organise my thought while trying to understand the exploit chain posted in Project Zero blog. Therefore, I recommend reading [their post](https://github.com/adamyordan/blog/blob/master/content/posts/googleprojectzero.blogspot.com/2019/04/virtually-unlimited-memory-escaping.html).
 
 ## References
 
@@ -295,4 +296,3 @@ Please note that this is not a writeup of an exploit. In this post, I discussed 
 * [CVE-2019-5782 exploit PoC](https://github.com/vngkv123/aSiagaming/tree/master/Chrome-v8-906043)
 * [Chromium repo - Mojo IPC docs](https://chromium.googlesource.com/chromium/src.git/+/master/mojo/README.md)
 * [Stanford paper - The Security Architecture of the Chromium Browser](https://seclab.stanford.edu/websec/chromium/)
-

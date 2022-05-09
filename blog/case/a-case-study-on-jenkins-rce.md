@@ -1,5 +1,6 @@
 ---
 description: 2020-01-21 — 7 min read
+layout: editorial
 ---
 
 # A Case Study on Jenkins RCE
@@ -8,11 +9,11 @@ During my past experience assessing the security of Jenkins, I found several thi
 
 ## Information Gathering
 
-The first thing to do is to collect information about past vulnerabilities and exploits. The best place to find this information is the [Jenkin's official security advisories](https://jenkins.io/security/advisories/). At that time \(January 2019\), we saw that there is a _Sandbox Bypass_ vulnerability patched in the latest version in the [2019-01-08 Advisory](https://jenkins.io/security/advisory/2019-01-08/).
+The first thing to do is to collect information about past vulnerabilities and exploits. The best place to find this information is the [Jenkin's official security advisories](https://jenkins.io/security/advisories/). At that time (January 2019), we saw that there is a _Sandbox Bypass_ vulnerability patched in the latest version in the [2019-01-08 Advisory](https://jenkins.io/security/advisory/2019-01-08/).
 
 > **Sandbox Bypass in Script Security and Pipeline Plugins**
 >
-> **SECURITY-1266 / CVE-2019-1003000 \(Script Security\), CVE-2019-1003001 \(Pipeline: Groovy\), CVE-2019-1003002 \(Pipeline: Declarative\)**
+> **SECURITY-1266 / CVE-2019-1003000 (Script Security), CVE-2019-1003001 (Pipeline: Groovy), CVE-2019-1003002 (Pipeline: Declarative)**
 >
 > Script Security sandbox protection could be circumvented during the script compilation phase by applying AST transforming annotations such as @Grab to source code elements.
 >
@@ -22,7 +23,7 @@ The first thing to do is to collect information about past vulnerabilities and e
 >
 > All known unsafe AST transformations in Groovy are now prohibited in sandboxed scripts.
 
-At that time, the proof of concept is not yet published by the reporter \([Orange Tsai](https://twitter.com/orange_8361/status/1085510564393041925)\). Since we are interested in how to exploit this vulnerability, the thing we can do is to look into the patches. This is quite easy because Jenkins is an open-source project. We can see every detailed commit on their repository. We can find the related commit in [Bugzilla page](https://bugzilla.redhat.com/show_bug.cgi?id=1667566).
+At that time, the proof of concept is not yet published by the reporter ([Orange Tsai](https://twitter.com/orange\_8361/status/1085510564393041925)). Since we are interested in how to exploit this vulnerability, the thing we can do is to look into the patches. This is quite easy because Jenkins is an open-source project. We can see every detailed commit on their repository. We can find the related commit in [Bugzilla page](https://bugzilla.redhat.com/show\_bug.cgi?id=1667566).
 
 The upstream patches:
 
@@ -36,15 +37,15 @@ In the repository, we can see that the patches are blacklisting some annotations
 
 We can see that there is a difference in how `GroovySandbox` class creates the _compiler configuration_. There is an additional step that add _compilation customizer_ `RejectASTTransformsCustomizer` that with a the disabled transformations of only a single value: `GrabAnnotationTransformation.class.getName()`.
 
-![](../../../.gitbook/assets/image%20%287%29.png)
+![](<../../.gitbook/assets/image (7).png>)
 
 The `RejectASTTransformsCustomizer` is a new class with a logic that traverse annotations and do simple blacklist checking:
 
-![](../../../.gitbook/assets/image%20%2812%29.png)
+![](<../../.gitbook/assets/image (12).png>)
 
 We can also see that there is a new test code that check if the blacklist `Grab` annotation.
 
-![](../../../.gitbook/assets/image%20%2816%29.png)
+![](<../../.gitbook/assets/image (16).png>)
 
 ## The Grab Annotation
 
@@ -62,7 +63,7 @@ During compile-time, this will add `commons-lang:commons-lang:2.4` library as de
 
 ## Exploit Idea
 
-For information, Jenkins's pipeline build script is written in groovy. Upon executing a pipeline job, this build script will be compiled \(and executed\) in Jenkins master, resulting in a definition of the pipeline, e.g. what to do in slave nodes. As a security measure, Jenkins provides a mechanism for the script to be executed in _sandbox mode_. In sandbox mode, all dangerous functions are blacklisted, so regular user cannot do anything malicious to the Jenkins node servers.
+For information, Jenkins's pipeline build script is written in groovy. Upon executing a pipeline job, this build script will be compiled (and executed) in Jenkins master, resulting in a definition of the pipeline, e.g. what to do in slave nodes. As a security measure, Jenkins provides a mechanism for the script to be executed in _sandbox mode_. In sandbox mode, all dangerous functions are blacklisted, so regular user cannot do anything malicious to the Jenkins node servers.
 
 As mentioned before, the build script is written in Groovy. Groovy script allows us to use any class or function in Java packages. However, in sandbox mode, dangerous built-in ones are blacklisted. But we can see that's not the case for **non-built-in** class.
 
@@ -87,11 +88,11 @@ print new ProcBuilder("/bin/bash").withArgs("-c","cat /etc/passwd").run().getOut
 
 Let's try putting the pipeline script in a Jenkins Job with _Use Groovy Sandbox_ enabled.
 
-![](../../../.gitbook/assets/image%20%2814%29.png)
+![](<../../.gitbook/assets/image (14).png>)
 
 After triggering the job build, the script above will be compiled and executed in Jenkins master. After the job build is done, we can see the result of the shell command `cat /etc/passwd` in the job console output.
 
-![](../../../.gitbook/assets/image%20%289%29.png)
+![](<../../.gitbook/assets/image (9).png>)
 
 Furthermore, we can work on getting the reverse shell session using the same method.
 
@@ -104,13 +105,13 @@ After getting shell access to the Jenkins master server. The next thing we can d
 * Steal source code
 * Steal keys and secrets
 
-From a page [Securing JENKINS\_HOME](https://wiki.jenkins.io/display/JENKINS/Securing+JENKINS_HOME), we know that Jenkins is putting all their info and states in `$JENKINS_HOME`, by default it is located in directory `/var/jenkins`.
+From a page [Securing JENKINS\_HOME](https://wiki.jenkins.io/display/JENKINS/Securing+JENKINS\_HOME), we know that Jenkins is putting all their info and states in `$JENKINS_HOME`, by default it is located in directory `/var/jenkins`.
 
 ### Accessing encrypted sensitive information
 
-Jenkins are not using any DBMS to store data, it stores data and states in XML file under `$JENKINS_HOME`. In this directory, we can read \(and modify\) information about the users, jobs, etc. However, sensitive data \(e.g.s secrets\) is encrypted.
+Jenkins are not using any DBMS to store data, it stores data and states in XML file under `$JENKINS_HOME`. In this directory, we can read (and modify) information about the users, jobs, etc. However, sensitive data (e.g.s secrets) is encrypted.
 
-Fortunately \(_or unfortunately?_\), Jenkins also stores the encryption key under the same `$JENKINS_HOME` directory. I am not saying that this is a bad practice, because the problem of storing key itself is a hard problem. You may search more about this in google with term _"Secret Zero Problem"_.
+Fortunately (_or unfortunately?_), Jenkins also stores the encryption key under the same `$JENKINS_HOME` directory. I am not saying that this is a bad practice, because the problem of storing key itself is a hard problem. You may search more about this in google with term _"Secret Zero Problem"_.
 
 Basically, there are two files needed for decrypting the encryption: `secrets/master.key` and `secrets/hudson.util.Secret`. With these two file, we can decrypt all the encrypted information inside Jenkins. For example we can decrypt Jenkins secret stored in `credentials.xml`. There are already many scripts on the internet for decrypting the Jenkins secret, e.g. [jenkins-decrypt](https://github.com/tweksteen/jenkins-decrypt/blob/master/decrypt.py).
 
@@ -120,13 +121,13 @@ We can see a list of user at `$JENKINS_HOME/users`. Moreover, we can see data or
 
 We can use this access token to authenticate in Jenkins Web dashboard by setting it in `Authorization` HTTP Header. For demonstration, we can use curl to do _whoami_ in Jenkins:
 
-![](../../../.gitbook/assets/image%20%285%29.png)
+![](<../../.gitbook/assets/image (5).png>)
 
 ### Maintaining Persistence
 
 Apart from regular maintaining persistence techniques, such as using crontab, or injecting `.bashrc`, we can utilize the hijacked Jenkins admin account. Jenkins provides a script console functionality that can be used admin to execute arbitrary Groovy script in **non-sandbox** mode.
 
-![](../../../.gitbook/assets/image%20%283%29.png)
+![](<../../.gitbook/assets/image (3).png>)
 
 Moreover, we can also use this console to enumerate stored secrets in Jenkins with the following script:
 
@@ -158,13 +159,12 @@ We can learn from the past incidents that the damage is fatal:
 
 We need to also be aware that Jenkins is an old piece of software written in early 2000s and may contains many legacy code and bugs.
 
-![](../../../.gitbook/assets/image%20%2815%29.png)
+![](<../../.gitbook/assets/image (15).png>)
 
-From the charts \([source](https://www.cvedetails.com/product/34004/Jenkins-Jenkins.html?vendor_id=15865)\) displayed above, we can see that Jenkins are affected by lots of critical vulnerabilities, especially in recent years. Constant check and software update on Jenkins instance is highly recommended and necessary to create a safe environment within an organization.
+From the charts ([source](https://www.cvedetails.com/product/34004/Jenkins-Jenkins.html?vendor\_id=15865)) displayed above, we can see that Jenkins are affected by lots of critical vulnerabilities, especially in recent years. Constant check and software update on Jenkins instance is highly recommended and necessary to create a safe environment within an organization.
 
 ### Proof-of-Concept Source Code
 
 I put a proof of concept based on this exploit method in Github:
 
 > [https://github.com/adamyordan/cve-2019-1003000-jenkins-rce-poc](https://github.com/adamyordan/cve-2019-1003000-jenkins-rce-poc)
-
