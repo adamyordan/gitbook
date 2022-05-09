@@ -4,12 +4,16 @@ Welcome to my Notebook. My name is Adam. In this gitbook, I will write about thi
 
 ### My Writings
 
-{% content-ref url="blog/case/" %}
-[case](blog/case/)
+{% content-ref url="blog/vulnerability-writeups.md" %}
+[vulnerability-writeups.md](blog/vulnerability-writeups.md)
 {% endcontent-ref %}
 
 {% content-ref url="blog/ctf-writeups/" %}
 [ctf-writeups](blog/ctf-writeups/)
+{% endcontent-ref %}
+
+{% content-ref url="blog/case/" %}
+[case](blog/case/)
 {% endcontent-ref %}
 
 

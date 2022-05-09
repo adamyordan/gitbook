@@ -4,13 +4,14 @@
 
 ## Blog
 
-* [Security Case Study](blog/case/README.md)
-  * [A Take on Chrome Sandbox Escape Exploit Chain](blog/case/chrome-sandbox-escape.md)
-  * [A Case Study on Jenkins RCE](blog/case/a-case-study-on-jenkins-rce.md)
-  * [Elastic SIEM Review](blog/case/elastic-siem-review.md)
+* [Vulnerability Writeups](blog/vulnerability-writeups.md)
 * [CTF Writeups](blog/ctf-writeups/README.md)
   * [Pwn2Win 2021 - Illusion](blog/ctf-writeups/pwn2win-2021-illusion.md)
   * [Pwn2Win 2021 - Lost Exponent](blog/ctf-writeups/pwn2win-2021-lost-exponent.md)
+* [Security Case Study](blog/case/README.md)
+  * [Chrome Sandbox Escape Exploit Chain](blog/case/chrome-sandbox-escape.md)
+  * [A Case Study on Jenkins RCE](blog/case/a-case-study-on-jenkins-rce.md)
+  * [Elastic SIEM Review](blog/case/elastic-siem-review.md)
 
 ## Projects
 
