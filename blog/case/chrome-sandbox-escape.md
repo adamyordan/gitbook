@@ -1,6 +1,5 @@
 ---
 description: 2020-02-02 — 11 min read
-layout: editorial
 ---
 
 # A Take on Chrome Sandbox Escape Exploit Chain

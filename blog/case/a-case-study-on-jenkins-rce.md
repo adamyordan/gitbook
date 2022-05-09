@@ -1,6 +1,5 @@
 ---
 description: 2020-01-21 — 7 min read
-layout: editorial
 ---
 
 # A Case Study on Jenkins RCE
