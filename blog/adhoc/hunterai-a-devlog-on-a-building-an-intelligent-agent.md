@@ -12,9 +12,11 @@ This is my project devlog to create a _certain complex_ AI. In each part of this
 
 {% embed url="https://www.youtube.com/watch?v=XRnqPfFGsps" %}
 
-On 28 January 2020, I created a **reflex agent with internal state** in an imperfect information environment. Specifically, I created a top-down shooter AI with limited vision range to its surrounding. Using common pathfinding algorithm \(in this case, BFS\), the AI agent is able to determine an efficient way to discover monsters and position itself in the nearest shooting position.
+On 28 January 2020, I created a **reflex agent with internal state** in an imperfect information environment. Specifically, I created a top-down shooter AI with limited vision range to its surrounding. Using common pathfinding algorithm (in this case, BFS), the AI agent is able to determine an efficient way to discover monsters and position itself in the nearest shooting position.
 
-{% embed url="https://github.com/adamyordan/hunterAI" caption="Source code: https://github.com/adamyordan/hunterAI" %}
+{% embed url="https://github.com/adamyordan/hunterAI" %}
+Source code: https://github.com/adamyordan/hunterAI
+{% endembed %}
 
 ## Part 1: Creating a simple Intelligent Agent
 
@@ -22,7 +24,7 @@ On 28 January 2020, I created a **reflex agent with internal state** in an imper
 
 ### Today's Goal
 
-For the first part, I will try to make an intelligent agent that can hunt monster. I name this agent: **Hunter**. \(_In the future, this version will be referenced as **Alexander**_\)
+For the first part, I will try to make an intelligent agent that can hunt monster. I name this agent: **Hunter**. (_In the future, this version will be referenced as **Alexander**_)
 
 ### Defining "Agent"
 
@@ -62,7 +64,7 @@ $$
 
 where:
 
-**Architecture**: a device with sensors and actuators.  
+**Architecture**: a device with sensors and actuators.\
 **Agent Program**: a program implementing _Agent Function_ $$f$$ on top an architecture, where **Agent Function** is a function that maps a **sequence of perceptions** into **action**.
 
 $$
@@ -230,7 +232,7 @@ class Simulator:
 ```
 {% endcode %}
 
-Our simulator class represents a _world_ where our agent is running. As you may realize, We have not yet defined what a _world_ is. Let's define **world** as a triplet $$<time, environment, agents>$$ , where _**time**_ is an increasing number that represents a moment in the world. A _world_ contains an _**environment**_ and a list of agent \(_**agents**_\) that will interact with the environment.
+Our simulator class represents a _world_ where our agent is running. As you may realize, We have not yet defined what a _world_ is. Let's define **world** as a triplet $$<time, environment, agents>$$ , where _**time**_ is an increasing number that represents a moment in the world. A _world_ contains an _**environment**_ and a list of agent (_**agents**_) that will interact with the environment.
 
 A moment in the world can be moved forward by calling `step()` function. When stepping, the agents will start processing the environment, perceiving and acting upon it; and the time will increase.
 
@@ -299,7 +301,7 @@ Today, we learned about Intelligent agent and we have built a very simple intell
 
 * [https://hackernoon.com/rational-agents-for-artificial-intelligence-caf94af2cec5](https://hackernoon.com/rational-agents-for-artificial-intelligence-caf94af2cec5)
 * [https://www.geeksforgeeks.org/agents-artificial-intelligence/](https://www.geeksforgeeks.org/agents-artificial-intelligence/)
-* [http://www.cs.bham.ac.uk/~jxb/IAI/w4.pdf](http://www.cs.bham.ac.uk/~jxb/IAI/w4.pdf)
+* [http://www.cs.bham.ac.uk/\~jxb/IAI/w4.pdf](http://www.cs.bham.ac.uk/\~jxb/IAI/w4.pdf)
 
 
 
@@ -309,9 +311,9 @@ Today, we learned about Intelligent agent and we have built a very simple intell
 
 ### Today's Goal
 
-In this part, I will try to create a 3D visualization using Unity and connect it to our agent written in python. You may want to read the previous part about **Alexander** AI concept because we will reuse a lot of the concepts. \(_In the future, today's version will be referenced as **Barton**_\).
+In this part, I will try to create a 3D visualization using Unity and connect it to our agent written in python. You may want to read the previous part about **Alexander** AI concept because we will reuse a lot of the concepts. (_In the future, today's version will be referenced as **Barton**_).
 
-![Part 2&apos;s Milestone](../../.gitbook/assets/image%20%2820%29.png)
+![Part 2's Milestone](<../../.gitbook/assets/image (20).png>)
 
 ### Idea
 
@@ -322,38 +324,38 @@ Updated remote agent concepts in python side:
 * **Remote environment**: remote environment is similar with common environment, a representation that will be perceived and acted upon by architecture. The differences are:
   * The architecture is not allowed to modify environment state directly. Action from architecture will be stored at `remote_action`.
   * Environment state is updated at every moment / step. This constant update is required because the Remote environment is actually a representation of the corresponding environment objects in the Unity side.
-* **Remote architecture**: implementation-wise there is no difference with common architecture. However, there is an important concept that must be followed by remote architecture during actuating actions. Remote architecture should never modify environment state directly, instead it should use `set_remote_action(action)` function to pass the action \(`remote_action`\) to the Unity side. The action will be then realized by the corresponding agent object in the Unity side.
+* **Remote architecture**: implementation-wise there is no difference with common architecture. However, there is an important concept that must be followed by remote architecture during actuating actions. Remote architecture should never modify environment state directly, instead it should use `set_remote_action(action)` function to pass the action (`remote_action`) to the Unity side. The action will be then realized by the corresponding agent object in the Unity side.
 
 Next, We have to define a **remote communication module** that allows communication between the python and Unity side. One of the simplest approach is by serving a **python HTTP server**, and let Unity side send requests and receive responds from the python side.
 
-![Communication Protocol for our AI python process and Unity](../../.gitbook/assets/image%20%2823%29.png)
+![Communication Protocol for our AI python process and Unity](<../../.gitbook/assets/image (23).png>)
 
 The HTTP server behaviour is defined as follows:
 
 * Endpoint `/init` will initiate the time, environment and agents. The initiation procedure is passed as `init_function` parameter when constructing `Remote` module.
 * Endpoint `/step` will trigger the _world_ step, moving the time forward. This endpoint accepts environment state in JSON format. These actions will be executed:
-  * Retrieve the environment state from Unity \(from the HTTP body\), then update the the python representation of remote environment will update its state accordingly to the passed state.
+  * Retrieve the environment state from Unity (from the HTTP body), then update the the python representation of remote environment will update its state accordingly to the passed state.
   * The agents will start processing the environment, perceiving the environment and producing `remote_action`.
   * The `remote_action` will be returned as HTTP Response. The Unity side will read this action and actuate it accordingly.
   * Increase time.
 
 ### The Unity
 
-![Unity Editor of our AI visualization](../../.gitbook/assets/image%20%2821%29.png)
+![Unity Editor of our AI visualization](<../../.gitbook/assets/image (21).png>)
 
 For illustration, I show the completed today's Unity project above. Quick explanation of what is happening in the Unity scene:
 
-* The blue cube represents the `Hunter` \(player\) object.
+* The blue cube represents the `Hunter` (player) object.
 * The red cube represents the `Monster` object.
-* The blue cube can spawn `Projectile` object that will hit the red cube out, making it fall off the ground \(then destroyed\).
+* The blue cube can spawn `Projectile` object that will hit the red cube out, making it fall off the ground (then destroyed).
 
 The main problem here is how to make `Hunter` object communicate with our Hunter agent in python? As discussed in the _Idea_ section, we are going to make the Unity communicate with our python with an HTTP client.
 
-First, put an empty object \(`Simulator`\) into our Unity scene. Then, add `HunterSDK` and `SimulatorScript` as components to `Simulator` object.
+First, put an empty object (`Simulator`) into our Unity scene. Then, add `HunterSDK` and `SimulatorScript` as components to `Simulator` object.
 
 The `HunterSDK` is essentially the code to communicate with our server protocol. It provides the `Initiate()` and `Step()` method. The `initiate()` method will send a request to `/init` endpoint, initiating agents and environment representation in python side. The `Step()` method accepts the current environment state in Unity, then send it in JSON format alongside a request to `/step` endpoint, and then pass the respond to the callback function. The respond should be containing the action to be actuated.
 
-{% code title="HunterSDK.cs \(partial\)" %}
+{% code title="HunterSDK.cs (partial)" %}
 ```csharp
 public class HunterSDK : MonoBehaviour
 {
@@ -387,7 +389,7 @@ public class HunterSDK : MonoBehaviour
 ```
 {% endcode %}
 
-Next, the `SimulatorScript` is a behavioural code that should define the behaviour of our agents and environment in Unity side. Initially in `Start()`, it will run `HunterSDK.Initiate()`. Then, after a fixed interval, it will periodically call the `SimulatorScript.Step()` function. In this step function, you need to determine the current environment state with Unity functionality \(e.g. Calculate the visibility of monster\), then pass it to `HunterSDK.Step(state)`. Finally, you also need to define what should be done to actuate action accordingly \(e.g. Spawn a projectile\).
+Next, the `SimulatorScript` is a behavioural code that should define the behaviour of our agents and environment in Unity side. Initially in `Start()`, it will run `HunterSDK.Initiate()`. Then, after a fixed interval, it will periodically call the `SimulatorScript.Step()` function. In this step function, you need to determine the current environment state with Unity functionality (e.g. Calculate the visibility of monster), then pass it to `HunterSDK.Step(state)`. Finally, you also need to define what should be done to actuate action accordingly (e.g. Spawn a projectile).
 
 {% code title="SimulatorScript.cs" %}
 ```csharp
@@ -465,7 +467,7 @@ As discussed above, we will be serving a python HTTP server, and let Unity side 
 
 * Endpoint `/init` will initiate the time, environment and agents. The initiation procedure is passed as `init_function` parameter when constructing `Remote` module.
 * Endpoint `/step` will trigger the _world_ step, moving the time forward. This endpoint accepts environment state in JSON format. These actions will be executed:
-  * Retrieve the environment state from Unity \(from the HTTP body\), then update the the python representation of remote environment will update its state accordingly to the passed state.
+  * Retrieve the environment state from Unity (from the HTTP body), then update the the python representation of remote environment will update its state accordingly to the passed state.
   * The agents will start processing the environment, perceiving the environment and producing `remote_action`.
   * `remote_action` will be returned as HTTP Response. The Unity side will read this action and actuate its accordingly.
   * Increase time.
@@ -592,7 +594,7 @@ We can start the python remove server by running the following shell command:
 
 Remember that we need to write the code to fill in environment state values and actuating agent action in Unity scene.
 
-According to our current Hunter scenario, there is only one state information that we need to attain: monster visibility \(`monster_visible`\). Let's just implement that `monster_visible` is true if the monster object exists and the distance between player object and the monster object is less than 4 unit.
+According to our current Hunter scenario, there is only one state information that we need to attain: monster visibility (`monster_visible`). Let's just implement that `monster_visible` is true if the monster object exists and the distance between player object and the monster object is less than 4 unit.
 
 Next, in actuator code block, we check that if the action id is `"shoot"`, then we call the method `playerScript.Shoot()`. This method is essentially spawn a projectile and add a big force toward the monster object direction. By the physics of Unity engine, the monster object will be pushed backward by the projectile and it will fall off the ground.
 
@@ -684,7 +686,7 @@ In this part, I will try to create a **reflex agent with internal state** in an 
 
 _For future reference, today's version will be referenced as **Caleb**._
 
-![Part 3&apos;s Milestone](../../.gitbook/assets/image%20%2824%29.png)
+![Part 3's Milestone](<../../.gitbook/assets/image (24).png>)
 
 ### The Scenario
 
@@ -693,7 +695,7 @@ We are going to expand from the previous part. In today's scenario, we are going
 * There will be some monsters placed at random coordinates.
 * Hunter's vision range is limited. Thus making hunter to not have perfect information.
 * Projectile range is limited. Thus, hunter needs to position itself accordingly to shoot monsters.
-* In a moment, the actions that hunter can take are: 
+* In a moment, the actions that hunter can take are:&#x20;
   * $$MoveForward$$
   * $$RotateLeft$$
   * $$RotateRight$$
@@ -709,9 +711,9 @@ I put the finished demo in the early section of this part with hope of motivatin
 
 In this scenario, we are going to face a problem where we need to find the shortest path to multiple cells. For example, there are multiple monsters in the grid, and hunter needs to approach the nearest monster.
 
-To solve this problem, we can use Breadth-first-Search \(BFS\); with Hunter's coordinate as starting point and monsters coordinates as goals. With BFS, since we are going to do level order traversal, the first goal that we reach is the nearest goal. We can then follow the path formed, which is the shortest path to the nearest goal.
+To solve this problem, we can use Breadth-first-Search (BFS); with Hunter's coordinate as starting point and monsters coordinates as goals. With BFS, since we are going to do level order traversal, the first goal that we reach is the nearest goal. We can then follow the path formed, which is the shortest path to the nearest goal.
 
-![BFS to find nearest target](../../.gitbook/assets/image%20%2822%29.png)
+![BFS to find nearest target](<../../.gitbook/assets/image (22).png>)
 
 {% code title="caleb/algorithm/bfs.py" %}
 ```python
@@ -813,41 +815,41 @@ Based on the idea in Part 2, let's make it more generalized for remote architect
 For remote architecture, there are two functions that we must implement in an `Architecture` class.
 
 * In `perceive` function, we just return a Percept instance containing the environment state.
-* In `act` function, we just pass the action to remote environment through `set_remote_action`.
+*   In `act` function, we just pass the action to remote environment through `set_remote_action`.
 
-  ```text
-  # caleb/architecture.py
+    ```
+    # caleb/architecture.py
 
-  from alexander.concepts import Percept, Architecture
+    from alexander.concepts import Percept, Architecture
 
 
-  class GeneralRemoteArchitecture(Architecture):
-      def perceive(self, environment):
-          return Percept(environment.state)
+    class GeneralRemoteArchitecture(Architecture):
+        def perceive(self, environment):
+            return Percept(environment.state)
 
-      def act(self, environment, action):
-          environment.set_remote_action(action)
-  ```
+        def act(self, environment, action):
+            environment.set_remote_action(action)
+    ```
 
 For remote environment:
 
 * We store a state in a Key-Value data structure.
-* We provide a function to update this state data: `update_state`.
+*   We provide a function to update this state data: `update_state`.
 
-  ```text
-  # caleb/environment.py
+    ```
+    # caleb/environment.py
 
-  from barton.concepts import RemoteEnvironment
+    from barton.concepts import RemoteEnvironment
 
 
-  class GeneralRemoteEnvironment(RemoteEnvironment):
-      def __init__(self):
-          super().__init__()
-          self.state = {}
+    class GeneralRemoteEnvironment(RemoteEnvironment):
+        def __init__(self):
+            super().__init__()
+            self.state = {}
 
-      def update_state(self, state):
-          self.state = state
-  ```
+        def update_state(self, state):
+            self.state = state
+    ```
 
 ### Implementing the Hunter Agent Program
 
@@ -900,7 +902,7 @@ class HunterProgram(Program):
         pass # todo
 ```
 
-Then, we are going to write the main file. In main, we define our `init_function` that will instantiate the hunter environment and agent. Then we pass the it to Remote module \(Read Part 2\), and run the python remote server.
+Then, we are going to write the main file. In main, we define our `init_function` that will instantiate the hunter environment and agent. Then we pass the it to Remote module (Read Part 2), and run the python remote server.
 
 ```python
 from alexander.concepts import Agent
@@ -1136,11 +1138,11 @@ As of now, our agent is already fully working. If we connect our agent with the 
 
 Now that we already have a fully working agent in CLI environment, let's make a 3D World environment visualized using Unity. Please take a loot at Part 2 to understand the mechanic to connect Unity visualization with our python agent program.
 
-![The Unity Editor](../../.gitbook/assets/image%20%2819%29.png)
+![The Unity Editor](<../../.gitbook/assets/image (19).png>)
 
 As shown in the image above, I already made a Unity scene containing a grid of `M x N` cells. The next thing interesting to discuss is the `simulation.cs` which contains the implementation of our simulation program logic.
 
-* In `Initiate()`, we are going to initiate the connection with our agent program via `HunterSDK.Initiate()`. Then, we will invoke `Step()` to be run every `SdkStepInterval` seconds \(default: 0.1\).
+* In `Initiate()`, we are going to initiate the connection with our agent program via `HunterSDK.Initiate()`. Then, we will invoke `Step()` to be run every `SdkStepInterval` seconds (default: 0.1).
 * In `Step()`:
   * Get state from Unity environment,
   * Send the state via `HunterSDK.Step()`
@@ -1199,9 +1201,9 @@ public class Simulator : MonoBehaviour
 }
 ```
 
-I also created a simulation option panel that allows user to configure the simulation option. For example, user can configure the grid size, the simulation step speed, or the hunter vision range. This allows us to experiment further, such as knowing the optimal vision range \(in case having long vision range costs something else\).
+I also created a simulation option panel that allows user to configure the simulation option. For example, user can configure the grid size, the simulation step speed, or the hunter vision range. This allows us to experiment further, such as knowing the optimal vision range (in case having long vision range costs something else).
 
-![Option Panel](../../.gitbook/assets/image%20%2818%29.png)
+![Option Panel](<../../.gitbook/assets/image (18).png>)
 
 #### The Challenges with Unity: Different Position Indexing
 
@@ -1209,7 +1211,7 @@ In Unity 3D, there are three axis in coordinates, i.e. `x`, `y`, `z`, which cons
 
 But there is another problem related in axis positional value. In our python agent program, the grid is represented vertically in _X_ axis from index `0` to `M`, and horizontally in _Y_ axis from index `0` to `N`. Meanwhile, in Unity, the position grid is represented vertically in _X_ axis from index `-M/2` to `M/2`, and horizontally in _Y_ axis from index `N/2` to `-N/2`. This inconsistency proves to become a problematic hassle during implementation, making implementation prone to indexing errors.
 
-![Different indexing in Unity and our python program](../../.gitbook/assets/image%20%2817%29.png)
+![Different indexing in Unity and our python program](<../../.gitbook/assets/image (17).png>)
 
 One way to solve this problem is by adding a position translation in python side:
 
@@ -1222,7 +1224,7 @@ def translate_pos(self, x, y):
 
 {% embed url="https://www.youtube.com/watch?v=XRnqPfFGsps" %}
 
-In this Part 3, we learned how to create a **reflex agent with internal state** in an imperfect information environment. Specifically, we created a top-down shooter AI with limited vision range to its surrounding. Using common pathfinding algorithm \(in this case, BFS\), our AI agent is able to determine an efficient way to discover monsters and position itself in the nearest shooting position.
+In this Part 3, we learned how to create a **reflex agent with internal state** in an imperfect information environment. Specifically, we created a top-down shooter AI with limited vision range to its surrounding. Using common pathfinding algorithm (in this case, BFS), our AI agent is able to determine an efficient way to discover monsters and position itself in the nearest shooting position.
 
 Combined with the configurability of our visualization, I believe this is a good learning material in learning how to implement and playing around basic AI.
 
@@ -1232,5 +1234,5 @@ Combined with the configurability of our visualization, I believe this is a good
 
 ### Reference
 
-* [https://people.eecs.berkeley.edu/~russell/aima1e/chapter02.pdf](https://people.eecs.berkeley.edu/~russell/aima1e/chapter02.pdf) \(Used as reference when implementing reflex agent function\)
-
+* [https://people.eecs.berkeley.edu/\~russell/aima1e/chapter02.pdf](https://people.eecs.berkeley.edu/\~russell/aima1e/chapter02.pdf)\
+  (Used as reference when implementing reflex agent function)
