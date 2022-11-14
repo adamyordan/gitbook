@@ -6,7 +6,7 @@ Who doesn't know Elastic stack? Elasticsearch, logstash, kibana is almost the go
 
 ### Deploying the Elastic Stack
 
-First, let's spin up an elastic stack. To avoid wasting time on setting up the stack deployment, I decided to spin up the cloud version on [https://cloud.elastic.co/](https://cloud.elastic.co). Setting up is very easy, the UI is beautiful and the experience is good.
+First, let's spin up an elastic stack. To avoid wasting time on setting up the stack deployment, I decided to spin up the cloud version on [https://cloud.elastic.co/](https://cloud.elastic.co/). Setting up is very easy, the UI is beautiful and the experience is good.
 
 ![](<../../.gitbook/assets/image (42).png>)
 
